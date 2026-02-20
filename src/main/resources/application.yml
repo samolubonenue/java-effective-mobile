@@ -1,0 +1,44 @@
+spring:
+  application:
+    name: bankcards
+
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:bankdb}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  liquibase:
+    change-log: classpath:db/migration/db.changelog-master.xml
+    enabled: true
+
+server:
+  port: 8080
+
+jwt:
+  secret: ${JWT_SECRET:verySecretKeyForJwtTokenGenerationThatShouldBeAtLeast256BitsLong12345}
+  expiration: 900000
+
+encryption:
+  secret-key: ${ENCRYPTION_KEY:AES256SecretKey32BytesLongHere!}
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+
+logging:
+  level:
+    com.example.bankcards: DEBUG
+    org.springframework.security: INFO

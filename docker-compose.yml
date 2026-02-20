@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: bankcards-db
+    environment:
+      POSTGRES_DB: bankdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - bankcards-network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bankcards-app
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: bankdb
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      JWT_SECRET: verySecretKeyForJwtTokenGenerationThatShouldBeAtLeast256BitsLong12345
+      ENCRYPTION_KEY: AES256SecretKey32BytesLongHere!
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - bankcards-network
+
+volumes:
+  postgres_data:
+
+networks:
+  bankcards-network:
+    driver: bridge
